@@ -1,27 +1,26 @@
 FROM ruby:2-alpine
 
-
-# throw errors if Gemfile has been modified since Gemfile.lock
-RUN bundle config --global frozen 1
-
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 COPY Gemfile /usr/src/app/
 COPY Gemfile.lock /usr/src/app/
 
-#RUN apk --update add postgresql-dev
+RUN apk add --no-cache nodejs
+RUN apk add --no-cache postgresql-dev
+RUN apk add --no-cache tzdata
 
-RUN apk --update add --virtual build-dependencies build-base postgresql-dev \
+
+RUN apk add --no-cache --virtual .build-deps \
+  build-base \
   && bundle install \
-  && apk del build-dependencies
-
-RUN bundle install
+  && apk del .build-deps
 
 COPY . /usr/src/app
 
-RUN apk add openrc
-RUN apk add postgresql
+RUN RAILS_ENV=production bundle exec rails assets:precompile
 
-#  /usr/lib/postgresql/9.4/bin/postgres -D /usr/lib/postgresql/9.4
-#
+EXPOSE 3000
+
+#CMD ["rails", "server", "-b", "0.0.0.0"]
+CMD ["/usr/src/app/run-tests.alpine.sh"]
