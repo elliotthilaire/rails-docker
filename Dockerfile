@@ -30,4 +30,7 @@ COPY . /usr/src/app
 
 RUN RAILS_ENV=production bundle exec rails assets:precompile
 
-CMD ['rails', 'server']
+EXPOSE 3000
+
+#CMD ["rails", "server", "-b", "0.0.0.0"]
+CMD ["/usr/src/app/run-tests.sh"]
