@@ -1,24 +1,27 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Experimentation with running docker/rails tests in a particular CI environment where postgres has to be installed and run inside the image.
 
-Things you may want to cover:
+The Dockerfile is kept small, a shell script is used to install, configure and run postgres.
 
-* Ruby version
+Two versions exist:
 
-* System dependencies
+## alpine
 
-* Configuration
+```
+docker build --file Dockerfile.alpine .
+```
 
-* Database creation
+```
+docker run <image-id> /usr/src/app/run-tests.alpine.sh
+```
 
-* Database initialization
+## slim
 
-* How to run the test suite
+```
+docker build --file Dockerfile.slim .
+```
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```
+docker run <image-id> /usr/src/app/run-tests.slim.sh
+```

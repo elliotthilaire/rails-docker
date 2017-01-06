@@ -3,18 +3,18 @@ FROM ruby:2-alpine
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
+RUN apk add --no-cache \
+      nodejs \
+      postgresql-dev \
+      tzdata
+
 COPY Gemfile /usr/src/app/
 COPY Gemfile.lock /usr/src/app/
 
-RUN apk add --no-cache nodejs
-RUN apk add --no-cache postgresql-dev
-RUN apk add --no-cache tzdata
-
-
 RUN apk add --no-cache --virtual .build-deps \
-  build-base \
-  && bundle install \
-  && apk del .build-deps
+      build-base \
+    && bundle install \
+    && apk del .build-deps
 
 COPY . /usr/src/app
 
@@ -22,5 +22,4 @@ RUN RAILS_ENV=production bundle exec rails assets:precompile
 
 EXPOSE 3000
 
-#CMD ["rails", "server", "-b", "0.0.0.0"]
-CMD ["/usr/src/app/run-tests.alpine.sh"]
+CMD ["rails", "server", "-b", "0.0.0.0"]

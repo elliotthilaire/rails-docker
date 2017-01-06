@@ -1,0 +1,36 @@
+FROM ruby:2-slim
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+# Install JS dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+      nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Postgres dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+      libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY Gemfile /usr/src/app/
+COPY Gemfile.lock /usr/src/app/
+
+# Install gems
+RUN set -ex \
+    && buildDeps='build-essential' \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends $buildDeps \
+    && bundle install \
+    && apt-get purge -y --auto-remove $buildDeps \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY . /usr/src/app
+
+RUN RAILS_ENV=production bundle exec rails assets:precompile
+
+EXPOSE 3000
+
+CMD ["rails", "server", "-b", "0.0.0.0"]
